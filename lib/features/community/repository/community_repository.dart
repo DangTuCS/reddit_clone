@@ -1,9 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:reddit/core/constants/firebase_constants.dart';
+import 'package:reddit/core/providers/firebase_provider.dart';
 import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/failure.dart';
 import 'package:reddit/models/community_model.dart';
+
+final communityRepositoryProvider = Provider((ref) {
+  return CommunityRepository(
+    firestore: ref.watch(firestoreProvider),
+  );
+});
 
 class CommunityRepository {
   final FirebaseFirestore _firestore;
@@ -19,6 +27,39 @@ class CommunityRepository {
         throw 'Community with the same name already exists!';
       }
       return right(_communities.doc(community.name).set(community.toJson()));
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(message: e.toString()));
+    }
+  }
+
+  Stream<List<CommunityModel>> getUserCommunities(String uid) {
+    return _communities
+        .where('members', arrayContains: uid)
+        .snapshots()
+        .map((event) {
+      List<CommunityModel> communities = [];
+      print(event.docs);
+      for (var doc in event.docs) {
+        communities
+            .add(CommunityModel.fromJson(doc.data() as Map<String, dynamic>));
+      }
+      return communities;
+    });
+  }
+
+  Stream<CommunityModel> getCommunityByName(String name) {
+    return _communities.doc(name).snapshots().map(
+          (event) => CommunityModel.fromJson(
+            event.data() as Map<String, dynamic>,
+          ),
+        );
+  }
+
+  FutureVoid editCommunity(CommunityModel community) async {
+    try {
+      return right(_communities.doc(community.name).update(community.toJson()));
     } on FirebaseException catch (e) {
       throw e.message!;
     } catch (e) {
