@@ -11,11 +11,11 @@ class CommunityListDrawer extends ConsumerWidget {
     Key? key,
   }) : super(key: key);
 
-  void navigateToCreateCommnunity(BuildContext context) {
+  void navigateToCreateCommunity(BuildContext context) {
     Routemaster.of(context).push('/create-community');
   }
 
-  void navigateToCommnunity(BuildContext context, CommunityModel community) {
+  void navigateToCommunity(BuildContext context, CommunityModel community) {
     Routemaster.of(context).push('/r/${community.name}');
   }
 
@@ -28,7 +28,7 @@ class CommunityListDrawer extends ConsumerWidget {
             ListTile(
               title: const Text('Create a community'),
               leading: const Icon(Icons.add),
-              onTap: () => navigateToCreateCommnunity(context),
+              onTap: () => navigateToCreateCommunity(context),
             ),
             const Divider(),
             ref.watch(userCommunityProvider).when(
@@ -42,7 +42,7 @@ class CommunityListDrawer extends ConsumerWidget {
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(community.avatar),
                           ),
-                          onTap: () => navigateToCommnunity(
+                          onTap: () => navigateToCommunity(
                             context,
                             community,
                           ),
