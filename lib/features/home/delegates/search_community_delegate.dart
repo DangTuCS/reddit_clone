@@ -60,6 +60,6 @@ class SearchCommunityDelegate extends SearchDelegate {
     BuildContext context,
     String communityName,
   ) {
-    Routemaster.of(context).push('/r/$communityName}');
+    Routemaster.of(context).push('/r/$communityName');
   }
 }

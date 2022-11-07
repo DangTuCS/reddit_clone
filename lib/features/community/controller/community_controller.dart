@@ -74,23 +74,25 @@ class CommunityController extends StateNotifier<bool> {
     });
   }
 
-  Future<void> joinCommunity(CommunityModel community, BuildContext context,) async {
+  Future<void> joinCommunity(
+    CommunityModel community,
+    BuildContext context,
+  ) async {
     final user = _ref.read(userProvider)!;
 
     Either<Failure, void> res;
-    if (community.members.contains(user.uid)){
+    if (community.members.contains(user.uid)) {
       res = await _communityRepository.leaveCommunity(community.name, user.uid);
     } else {
       res = await _communityRepository.joinCommunity(community.name, user.uid);
     }
 
-    res.fold((l) => showSnackBar(context,l.message), (r) {
+    res.fold((l) => showSnackBar(context, l.message), (r) {
       if (community.members.contains(user.uid)) {
-        showSnackBar(context, 'Community joined successfully!');
-      } else {
         showSnackBar(context, 'Community left successfully!');
+      } else {
+        showSnackBar(context, 'Community joined successfully!');
       }
-
     });
   }
 
@@ -136,6 +138,21 @@ class CommunityController extends StateNotifier<bool> {
 
     state = false;
     final res = await _communityRepository.editCommunity(community);
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) => Routemaster.of(context).pop(),
+    );
+  }
+
+  void addMods(
+    String communityName,
+    List<String> uids,
+    BuildContext context,
+  ) async {
+    final res = await _communityRepository.addMods(
+      communityName,
+      uids,
+    );
     res.fold(
       (l) => showSnackBar(context, l.message),
       (r) => Routemaster.of(context).pop(),
