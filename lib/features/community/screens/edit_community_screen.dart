@@ -59,11 +59,12 @@ class _EditCommunityScreenState extends ConsumerState<EditCommunityScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(communityControllerProvider);
+    final currentTheme = ref.watch(themeNotifierProvider);
     return isLoading
         ? const Loader()
         : ref.watch(getCommunityByNameProvider(widget.name)).when(
               data: (community) => Scaffold(
-                backgroundColor: Pallete.darkModeAppTheme.backgroundColor,
+                backgroundColor: currentTheme.backgroundColor,
                 appBar: AppBar(
                   title: const Text('Edit Community'),
                   elevation: 0,
