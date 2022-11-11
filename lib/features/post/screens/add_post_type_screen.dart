@@ -7,6 +7,7 @@ import 'package:reddit/core/common/error_text.dart';
 import 'package:reddit/core/common/loader.dart';
 import 'package:reddit/core/utils.dart';
 import 'package:reddit/features/community/controller/community_controller.dart';
+import 'package:reddit/features/post/controller/post_controller.dart';
 import '../../../models/community_model.dart';
 import '../../../theme/pallete.dart';
 
@@ -47,6 +48,37 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
     }
   }
 
+  void sharePost() {
+    if (widget.type == 'image' &&
+        bannerFile != null &&
+        titleController.text.isNotEmpty) {
+      ref.read(postControllerProvider.notifier).shareImagePost(
+            context: context,
+            title: titleController.text.trim(),
+            selectedCommunity: selectedCommunity ?? communities[0],
+            image: bannerFile,
+          );
+    } else if (widget.type == 'text' && titleController.text.isNotEmpty) {
+      ref.read(postControllerProvider.notifier).shareTextPost(
+            context: context,
+            title: titleController.text.trim(),
+            selectedCommunity: selectedCommunity ?? communities[0],
+            description: descriptionController.text.trim(),
+          );
+    } else if (widget.type == 'text' &&
+        titleController.text.isNotEmpty &&
+        linkController.text.isNotEmpty) {
+      ref.read(postControllerProvider.notifier).shareLinkPost(
+            context: context,
+            title: titleController.text.trim(),
+            selectedCommunity: selectedCommunity ?? communities[0],
+            link: linkController.text.trim(),
+          );
+    } else {
+      showSnackBar(context, 'Please enter all the field');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isTypeImage = widget.type == 'image';
@@ -59,7 +91,7 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
         title: Text('Post ${widget.type}'),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: sharePost,
             child: const Text('Share'),
           ),
         ],
@@ -147,7 +179,7 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
                             ),
                           )
                           .toList(),
-                      onChanged: (value){
+                      onChanged: (value) {
                         setState(() {
                           selectedCommunity = value;
                         });
